@@ -40,6 +40,24 @@ significant_qtl_table <- function(trait_name, categorical = FALSE) {
     P_average[i] = mean(pheno[gener.aa==1], na.rm = TRUE)
     C_sem[i] = sd(pheno[gener.aa==0], na.rm = TRUE) / sqrt(sum(gener.aa==0 & !is.na(pheno)))
     P_sem[i] = sd(pheno[gener.aa==1], na.rm = TRUE) / sqrt(sum(gener.aa==1 & !is.na(pheno)))
+    
+    # additional plots and tables
+    chr_markers <- bcp.scanone[bcp.scanone$chr==chrs[i] & !grepl("^c[0-9XY]*[.]loc[0-9]*[ ]*", rownames(bcp.scanone)),]
+    best_marker <- rownames(chr_markers)[which.max(chr_markers$lod)[1]]
+    pxg_data <- plotPXG(bcp, best_marker)
+    
+    # pxg plot
+    img_file_name = paste0(trait_name, "_chr", chrs[i], "_", best_marker)
+    dev.copy2pdf(file=paste0("outputs/scanone_individual_qtls/", img_file_name, ".pdf"), width=8, height=5)
+    
+    # table
+    
+    marker_data = tibble(id = bcp$pheno$id, geno = c("P", "C")[as.numeric(pxg_data[,1])], 
+                         pheno = pxg_data$pheno, 
+                        inferred = pxg_data$inferred)
+    marker_data = arrange(marker_data, geno, pheno)
+    write_csv(marker_data, paste0("outputs/scanone_individual_qtls/", img_file_name, ".csv"))
+      
   }
   
   tibble(trait = trait_name, chrs = chrs, position = position, LOD = LOD, ci_left=ci_left, ci_right=ci_right, 
@@ -75,8 +93,8 @@ abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
 
 dev.copy2pdf(file="outputs/scanone_ASY.pdf", width=8, height=5)
 
-significant_qtl_table("ASY%")
-alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("ASY%"))
+significant_qtl_table("ASY")
+alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("ASY"))
 
 
 # INFERTILITY (cat.) ------------------------------------------------------
