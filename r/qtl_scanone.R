@@ -1,0 +1,61 @@
+library(tidyverse)
+library(qtl)
+
+
+# TW ----------------------------------------------------------------------
+
+bcp <- read.cross(format = "csvsr", dir="data/", "genotypes_qtl.csv", "pheno_TW.csv", genotypes=c("A","H","P","D","C"), na="N")
+bcp <- calc.genoprob(bcp, step=1, error.prob=0.01)
+bcp.scanone <- scanone(bcp, method="hk")
+bcp.perm <- scanone(bcp, method="hk", n.perm=10000)
+
+save(bcp, bcp.scanone, bcp.perm, file = "data/scanone_TW.rdata")
+
+summary(bcp.perm)
+plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="TW")
+abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
+abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
+
+# SC  ----------------------------------------------------------------------
+
+bcp <- read.cross(format = "csvsr", dir="data/", "genotypes_qtl.csv", "pheno_SC.csv", genotypes=c("A","H","P","D","C"), na="N")
+bcp <- calc.genoprob(bcp, step=1, error.prob=0.01)
+bcp.scanone <- scanone(bcp, method="hk")
+bcp.perm <- scanone(bcp, method="hk", n.perm=10000)
+
+save(bcp, bcp.scanone, bcp.perm, file = "data/scanone_SC.rdata")
+
+summary(bcp.perm)
+plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="logSC")
+abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
+abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
+
+# ASY ----------------------------------------------------------------------
+
+bcp <- read.cross(format = "csvsr", dir="data/", "genotypes_qtl.csv", "pheno_ASY.csv", genotypes=c("A","H","P","D","C"), na="N")
+bcp <- calc.genoprob(bcp, step=1, error.prob=0.01)
+bcp.scanone <- scanone(bcp, method="hk")
+bcp.perm <- scanone(bcp, method="hk", n.perm=10000)
+
+save(bcp, bcp.scanone, bcp.perm, file = "data/scanone_ASY.rdata")
+
+summary(bcp.perm)
+plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="TW")
+abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
+
+
+# INFERTILITY (cat.) ------------------------------------------------------
+
+bcp <- read.cross(format = "csvsr", dir="data/", "genotypes_qtl.csv", "pheno_infertility_cat.csv", genotypes=c("A","H","P","D","C"), na="N")
+bcp <- calc.genoprob(bcp, step=1, error.prob=0.01)
+bcp.scanone <- scanone(bcp, method="hk", model="binary")
+bcp.perm <- scanone(bcp, method="hk", model="binary", n.perm=10000)
+
+save(bcp, bcp.scanone, bcp.perm, file = "data/scanone_infertility_cat.rdata")
+
+summary(bcp.perm)
+plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="Infertility (cat.)")
+abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
+abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
+
+
