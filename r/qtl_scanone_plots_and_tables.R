@@ -1,5 +1,6 @@
 library(tidyverse)
 library(qtl)
+library(WriteXLS)
 
 alltraits_qtl_table <- NULL
 
@@ -58,7 +59,7 @@ significant_qtl_table <- function(trait_name, inverse.transform = function(x) x,
     names(marker_data)[2] <- best_marker
     names(marker_data)[3] <- trait_name
     write_csv(marker_data, paste0("outputs/scanone_individual_qtls/", img_file_name, ".csv"))
-      
+    WriteXLS(marker_data, paste0("outputs/scanone_individual_qtls/", img_file_name, ".xls"))  
   }
   
   tibble(trait = trait_name, Chr = chrs, Position = position, LOD = LOD, CI_left=ci_left, CI_right=ci_right, 
@@ -119,8 +120,8 @@ alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("Inferti
 # QTL table ---------------------------------------------------------------
 
 write_csv(alltraits_qtl_table, "outputs/scanone_qtl_table.csv")
+WriteXLS(alltraits_qtl_table, "outputs/scanone_qtl_table.xls")
 
 # TODOs
 # 2) remap cM into Mb
-# 4) SEM for categorical variables
-# 6) Save tables also as XLSX
+# 4) SEM for categorical variables  
