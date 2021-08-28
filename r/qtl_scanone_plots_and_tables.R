@@ -14,10 +14,10 @@ abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
 
 dev.copy2pdf(file="outputs/scanone_TW.pdf", width=8, height=5)
 
-significant_qtl_table <- function(trait_name, categorical = FALSE) {
+significant_qtl_table <- function(trait_name, inverse.transform = function(x) x, categorical = FALSE) {
   critical.lod <- summary(bcp.perm)[[1]]
   significant.chrs <- unique(bcp.scanone$chr[bcp.scanone$lod > critical.lod])
-  pheno = bcp$pheno[,1]
+  pheno = inverse.transform(bcp$pheno[,1])
   
   N <- length(significant.chrs)
   position <- ci_left <- ci_right <- LOD <- C_average <- C_sem <- P_average <- P_sem <- rep(NA, N)
@@ -36,10 +36,10 @@ significant_qtl_table <- function(trait_name, categorical = FALSE) {
     probs.aa = bcp[["geno"]][[as.character(significant.chrs[i])]][["prob"]][, best_loc, 1]
     gener.aa = rbinom(rep(1,length(probs.aa)), 1, prob = probs.aa)
     
-    C_average[i] = mean(pheno[gener.aa==0], na.rm = TRUE)
-    P_average[i] = mean(pheno[gener.aa==1], na.rm = TRUE)
-    C_sem[i] = sd(pheno[gener.aa==0], na.rm = TRUE) / sqrt(sum(gener.aa==0 & !is.na(pheno)))
-    P_sem[i] = sd(pheno[gener.aa==1], na.rm = TRUE) / sqrt(sum(gener.aa==1 & !is.na(pheno)))
+    P_average[i] = mean(pheno[gener.aa==0], na.rm = TRUE)
+    C_average[i] = mean(pheno[gener.aa==1], na.rm = TRUE)
+    P_sem[i] = sd(pheno[gener.aa==0], na.rm = TRUE) / sqrt(sum(gener.aa==0 & !is.na(pheno)))
+    C_sem[i] = sd(pheno[gener.aa==1], na.rm = TRUE) / sqrt(sum(gener.aa==1 & !is.na(pheno)))
     
     # additional plots and tables
     chr_markers <- bcp.scanone[bcp.scanone$chr==chrs[i] & !grepl("^c[0-9XY]*[.]loc[0-9]*[ ]*", rownames(bcp.scanone)),]
@@ -51,17 +51,18 @@ significant_qtl_table <- function(trait_name, categorical = FALSE) {
     dev.copy2pdf(file=paste0("outputs/scanone_individual_qtls/", img_file_name, ".pdf"), width=8, height=5)
     
     # table
-    
-    marker_data = tibble(id = bcp$pheno$id, geno = c("P", "C")[as.numeric(pxg_data[,1])], 
-                         pheno = pxg_data$pheno, 
-                        inferred = pxg_data$inferred)
+    marker_data = tibble(id = bcp$pheno$id, geno = c("C", "P")[as.numeric(pxg_data[,1])], 
+                         pheno = inverse.transform(pxg_data$pheno), 
+                         inferred = pxg_data$inferred)
     marker_data = arrange(marker_data, geno, pheno)
+    names(marker_data)[2] <- best_marker
+    names(marker_data)[3] <- trait_name
     write_csv(marker_data, paste0("outputs/scanone_individual_qtls/", img_file_name, ".csv"))
       
   }
   
-  tibble(trait = trait_name, chrs = chrs, position = position, LOD = LOD, ci_left=ci_left, ci_right=ci_right, 
-        C_average=C_average, C_sem=C_sem, P_average=P_average, P_sem=P_sem)
+  tibble(trait = trait_name, Chr = chrs, Position = position, LOD = LOD, CI_left=ci_left, CI_right=ci_right, 
+        C_mean=C_average, C_sem=C_sem, P_mean=P_average, P_sem=P_sem)
 }
 
 significant_qtl_table("TW")
@@ -78,8 +79,9 @@ abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
 
 dev.copy2pdf(file="outputs/scanone_SC.pdf", width=8, height=5)
 
-significant_qtl_table("logSC")
-alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("logSC"))
+significant_qtl_table("SC", inverse.transform = function(x) exp(x)-1)
+alltraits_qtl_table <- rbind(alltraits_qtl_table, 
+                             significant_qtl_table("SC", inverse.transform = function(x) exp(x)-1))
 
 
 # ASY ----------------------------------------------------------------------
@@ -93,8 +95,10 @@ abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
 
 dev.copy2pdf(file="outputs/scanone_ASY.pdf", width=8, height=5)
 
-significant_qtl_table("ASY")
-alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("ASY"))
+asy.tranform.inverse = function(x) round(exp(x) * 100 / (1 + exp(x)), 3)
+significant_qtl_table("ASY", inverse.transform = asy.tranform.inverse)
+alltraits_qtl_table <- rbind(alltraits_qtl_table, 
+                             significant_qtl_table("ASY", inverse.transform = asy.tranform.inverse))
 
 
 # INFERTILITY (cat.) ------------------------------------------------------
@@ -115,8 +119,8 @@ alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("Inferti
 # QTL table ---------------------------------------------------------------
 
 write_csv(alltraits_qtl_table, "outputs/scanone_qtl_table.csv")
+
 # TODOs
-# 1) Make sure the P & C are in the right direction
 # 2) remap cM into Mb
-# 3) mean / sem summary on transformed on untransformed level?
 # 4) SEM for categorical variables
+# 6) Save tables also as XLSX
