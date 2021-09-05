@@ -27,4 +27,5 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 raw_data
+data
 pwd_cast_b6_tc.Rproj
