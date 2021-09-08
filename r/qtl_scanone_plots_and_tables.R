@@ -1,6 +1,7 @@
 library(tidyverse)
 library(qtl)
 library(WriteXLS)
+set.seed(42) # to get the same plots
 
 alltraits_qtl_table <- NULL
 
