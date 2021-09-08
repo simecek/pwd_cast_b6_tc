@@ -120,9 +120,12 @@ alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("Inferti
 
 # QTL table ---------------------------------------------------------------
 
+# convert position from cM to bp
+source("r/utils/cm2bp.R")
+alltraits_qtl_table$Position <- cm2bp(alltraits_qtl_table$Chr, alltraits_qtl_table$Position)
+
 write_csv(alltraits_qtl_table, "outputs/scanone_qtl_table.csv")
 WriteXLS(alltraits_qtl_table, "outputs/scanone_qtl_table.xls")
 
 # TODOs
-# 2) remap cM into Mb
 # 4) SEM for categorical variables  
