@@ -122,7 +122,7 @@ alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("Inferti
 
 # convert position from cM to bp
 source("r/utils/cm2bp.R")
-alltraits_qtl_table$Position <- cm2bp(alltraits_qtl_table$Chr, alltraits_qtl_table$Position)
+alltraits_qtl_table$Position <- round(cm2bp(alltraits_qtl_table$Chr, alltraits_qtl_table$Position))
 
 write_csv(alltraits_qtl_table, "outputs/scanone_qtl_table.csv")
 WriteXLS(alltraits_qtl_table, "outputs/scanone_qtl_table.xls")
