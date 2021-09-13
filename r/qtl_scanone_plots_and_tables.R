@@ -10,11 +10,12 @@ alltraits_qtl_table <- NULL
 load("data/scanone_TW.rdata")
 
 summary(bcp.perm)
+
+pdf(file="outputs/scanone_TW.pdf", width=8, height=5)
 plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="TW")
 abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
 abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
-
-dev.copy2pdf(file="outputs/scanone_TW.pdf", width=8, height=5)
+dev.off()
 
 significant_qtl_table <- function(trait_name, inverse.transform = function(x) x, categorical = FALSE) {
   critical.lod <- summary(bcp.perm)[[1]]
@@ -46,11 +47,13 @@ significant_qtl_table <- function(trait_name, inverse.transform = function(x) x,
     # additional plots and tables
     chr_markers <- bcp.scanone[bcp.scanone$chr==chrs[i] & !grepl("^c[0-9XY]*[.]loc[0-9]*[ ]*", rownames(bcp.scanone)),]
     best_marker <- rownames(chr_markers)[which.max(chr_markers$lod)[1]]
-    pxg_data <- plotPXG(bcp, best_marker)
     
     # pxg plot
     img_file_name = paste0(trait_name, "_chr", chrs[i], "_", best_marker)
-    dev.copy2pdf(file=paste0("outputs/scanone_individual_qtls/", img_file_name, ".pdf"), width=8, height=5)
+    pdf(file=paste0("outputs/scanone_individual_qtls/", img_file_name, ".pdf"), width=8, height=5)
+    pxg_data <- plotPXG(bcp, best_marker)
+    dev.off()
+    
     
     # table
     marker_data = tibble(id = bcp$pheno$id, geno = c("C", "P")[as.numeric(pxg_data[,1])], 
@@ -75,11 +78,12 @@ alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("TW"))
 load("data/scanone_SC.rdata")
 
 summary(bcp.perm)
+
+pdf(file="outputs/scanone_SC.pdf", width=8, height=5)
 plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="logSC")
 abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
 abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
-
-dev.copy2pdf(file="outputs/scanone_SC.pdf", width=8, height=5)
+dev.off()
 
 significant_qtl_table("SC", inverse.transform = function(x) exp(x)-1)
 alltraits_qtl_table <- rbind(alltraits_qtl_table, 
@@ -91,11 +95,12 @@ alltraits_qtl_table <- rbind(alltraits_qtl_table,
 load("data/scanone_ASY.rdata")
 
 summary(bcp.perm)
+
+pdf(file="outputs/scanone_ASY.pdf", width=8, height=5)
 plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="ASY%")
 abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
 abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
-
-dev.copy2pdf(file="outputs/scanone_ASY.pdf", width=8, height=5)
+dev.off()
 
 asy.tranform.inverse = function(x) round(exp(x) * 100 / (1 + exp(x)), 3)
 significant_qtl_table("ASY", inverse.transform = asy.tranform.inverse)
@@ -108,11 +113,12 @@ alltraits_qtl_table <- rbind(alltraits_qtl_table,
 load("data/scanone_infertility_cat.rdata")
 
 summary(bcp.perm)
+
+pdf(file="outputs/scanone_infertility_cat.pdf", width=8, height=5)
 plot(bcp.scanone, ylim = c(0, max(bcp.scanone$lod, summary(bcp.perm)[[1]])), main="Infertility (cat.)")
 abline(h=summary(bcp.perm)[[1]], col="red", lty=2)
 abline(h=summary(bcp.perm)[[2]], col="blue", lty=2)
-
-dev.copy2pdf(file="outputs/scanone_infertility_cat.pdf", width=8, height=5)
+dev.off()
 
 significant_qtl_table("Infertility (cat.)")
 alltraits_qtl_table <- rbind(alltraits_qtl_table, significant_qtl_table("Infertility (cat.)"))
