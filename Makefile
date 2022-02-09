@@ -14,6 +14,12 @@ scanone:
 scanone_outputs:
 	Rscript $(R_OPTS) r/qtl_scanone_plots_and_tables.R
 	
+scantwo:
+	Rscript $(R_OPTS) r/qtl_scantwo.R	
+	
+scanone_outputs:
+	Rscript $(R_OPTS) r/qtl_scantwo_plots_and_tables.R
+	
 clean:
 	rm -r data outputs
 	mkdir data outputs outputs/scanone_individual_qtls

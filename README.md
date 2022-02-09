@@ -20,5 +20,5 @@ QTL analysis for (PWDxCAST)xB6 TC1 paper
     1. `preprocessing_qtl_data.R` (combining MiniMUGA and GigaMUGA, reshaping into qtl/csvsr format)
     1. `qtl_scanone.R` (running qtl::scanone, calculating permutation thresholds)
     1. `qtl_scanone_plots_and_tables.R`  (scanone figures & tables)
-    
+    1. `qtl_scantwo.R`, `qtl_scantwo_plots_and_tables.R` (same for two dimensional scans)
     
